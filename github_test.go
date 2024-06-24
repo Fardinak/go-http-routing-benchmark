@@ -292,6 +292,7 @@ var (
 	githubGorillaMux      http.Handler
 	githubGowwwRouter     http.Handler
 	githubHttpRouter      http.Handler
+	githubHttpServeMux    http.Handler
 	githubHttpTreeMux     http.Handler
 	githubKocha           http.Handler
 	githubLARS            http.Handler
@@ -365,6 +366,9 @@ func init() {
 	})
 	calcMem("HttpRouter", func() {
 		githubHttpRouter = loadHttpRouter(githubAPI)
+	})
+	calcMem("HttpServeMux", func() {
+		githubHttpServeMux = loadHttpServeMux(githubAPI)
 	})
 	calcMem("HttpTreeMux", func() {
 		githubHttpTreeMux = loadHttpTreeMux(githubAPI)
@@ -487,6 +491,10 @@ func BenchmarkGowwwRouter_GithubStatic(b *testing.B) {
 func BenchmarkHttpRouter_GithubStatic(b *testing.B) {
 	req, _ := http.NewRequest("GET", "/user/repos", nil)
 	benchRequest(b, githubHttpRouter, req)
+}
+func BenchmarkHttpServeMux_GithubStatic(b *testing.B) {
+	req, _ := http.NewRequest("GET", "/user/repos", nil)
+	benchRequest(b, githubHttpServeMux, req)
 }
 func BenchmarkHttpTreeMux_GithubStatic(b *testing.B) {
 	req, _ := http.NewRequest("GET", "/user/repos", nil)
@@ -624,6 +632,10 @@ func BenchmarkHttpRouter_GithubParam(b *testing.B) {
 	req, _ := http.NewRequest("GET", "/repos/julienschmidt/httprouter/stargazers", nil)
 	benchRequest(b, githubHttpRouter, req)
 }
+func BenchmarkHttpServeMux_GithubParam(b *testing.B) {
+	req, _ := http.NewRequest("GET", "/repos/julienschmidt/httprouter/stargazers", nil)
+	benchRequest(b, githubHttpServeMux, req)
+}
 func BenchmarkHttpTreeMux_GithubParam(b *testing.B) {
 	req, _ := http.NewRequest("GET", "/repos/julienschmidt/httprouter/stargazers", nil)
 	benchRequest(b, githubHttpTreeMux, req)
@@ -741,6 +753,9 @@ func BenchmarkGowwwRouter_GithubAll(b *testing.B) {
 }
 func BenchmarkHttpRouter_GithubAll(b *testing.B) {
 	benchRoutes(b, githubHttpRouter, githubAPI)
+}
+func BenchmarkHttpServeMux_GithubAll(b *testing.B) {
+	benchRoutes(b, githubHttpServeMux, githubAPI)
 }
 func BenchmarkHttpTreeMux_GithubAll(b *testing.B) {
 	benchRoutes(b, githubHttpTreeMux, githubAPI)

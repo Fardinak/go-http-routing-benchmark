@@ -926,6 +926,31 @@ func loadHttpRouterSingle(method, path string, handle httprouter.Handle) http.Ha
 	return router
 }
 
+// net/http.ServeMux
+func httpServeMuxHandleWrite(w http.ResponseWriter, r *http.Request) {
+	io.WriteString(w, r.PathValue("name"))
+}
+
+func loadHttpServeMux(routes []route) http.Handler {
+	h := httpHandlerFunc
+	if loadTestHandler {
+		h = httpHandlerFuncTest
+	}
+
+	router := http.NewServeMux()
+	re := regexp.MustCompile(":([^/]*)")
+	for _, route := range routes {
+		router.HandleFunc(fmt.Sprintf("%s %s", route.method, re.ReplaceAllString(route.path, "{$1}")), h)
+	}
+	return router
+}
+
+func loadHttpServeMuxSingle(method, path string, handle http.HandlerFunc) http.Handler {
+	router := http.NewServeMux()
+	router.HandleFunc(fmt.Sprintf("%s %s", method, path), handle)
+	return router
+}
+
 // httpTreeMux
 func httpTreeMuxHandler(_ http.ResponseWriter, _ *http.Request, _ map[string]string) {}
 

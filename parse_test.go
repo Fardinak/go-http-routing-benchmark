@@ -74,6 +74,7 @@ var (
 	parseGorillaMux      http.Handler
 	parseGowwwRouter     http.Handler
 	parseHttpRouter      http.Handler
+	parseHttpServeMux    http.Handler
 	parseHttpTreeMux     http.Handler
 	parseKocha           http.Handler
 	parseLARS            http.Handler
@@ -147,6 +148,9 @@ func init() {
 	})
 	calcMem("HttpRouter", func() {
 		parseHttpRouter = loadHttpRouter(parseAPI)
+	})
+	calcMem("HttpServeMux", func() {
+		parseHttpServeMux = loadHttpServeMux(parseAPI)
 	})
 	calcMem("HttpTreeMux", func() {
 		parseHttpTreeMux = loadHttpTreeMux(parseAPI)
@@ -269,6 +273,10 @@ func BenchmarkGowwwRouter_ParseStatic(b *testing.B) {
 func BenchmarkHttpRouter_ParseStatic(b *testing.B) {
 	req, _ := http.NewRequest("GET", "/1/users", nil)
 	benchRequest(b, parseHttpRouter, req)
+}
+func BenchmarkHttpServeMux_ParseStatic(b *testing.B) {
+	req, _ := http.NewRequest("GET", "/1/users", nil)
+	benchRequest(b, parseHttpServeMux, req)
 }
 func BenchmarkHttpTreeMux_ParseStatic(b *testing.B) {
 	req, _ := http.NewRequest("GET", "/1/users", nil)
@@ -406,6 +414,10 @@ func BenchmarkHttpRouter_ParseParam(b *testing.B) {
 	req, _ := http.NewRequest("GET", "/1/classes/go", nil)
 	benchRequest(b, parseHttpRouter, req)
 }
+func BenchmarkHttpServeMux_ParseParam(b *testing.B) {
+	req, _ := http.NewRequest("GET", "/1/classes/go", nil)
+	benchRequest(b, parseHttpServeMux, req)
+}
 func BenchmarkHttpTreeMux_ParseParam(b *testing.B) {
 	req, _ := http.NewRequest("GET", "/1/classes/go", nil)
 	benchRequest(b, parseHttpTreeMux, req)
@@ -542,6 +554,10 @@ func BenchmarkHttpRouter_Parse2Params(b *testing.B) {
 	req, _ := http.NewRequest("GET", "/1/classes/go/123456789", nil)
 	benchRequest(b, parseHttpRouter, req)
 }
+func BenchmarkHttpServeMux_Parse2Params(b *testing.B) {
+	req, _ := http.NewRequest("GET", "/1/classes/go/123456789", nil)
+	benchRequest(b, parseHttpServeMux, req)
+}
 func BenchmarkHttpTreeMux_Parse2Params(b *testing.B) {
 	req, _ := http.NewRequest("GET", "/1/classes/go/123456789", nil)
 	benchRequest(b, parseHttpTreeMux, req)
@@ -659,6 +675,9 @@ func BenchmarkGowwwRouter_ParseAll(b *testing.B) {
 }
 func BenchmarkHttpRouter_ParseAll(b *testing.B) {
 	benchRoutes(b, parseHttpRouter, parseAPI)
+}
+func BenchmarkHttpServeMux_ParseAll(b *testing.B) {
+	benchRoutes(b, parseHttpServeMux, parseAPI)
 }
 func BenchmarkHttpTreeMux_ParseAll(b *testing.B) {
 	benchRoutes(b, parseHttpTreeMux, parseAPI)

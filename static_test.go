@@ -170,8 +170,6 @@ var staticRoutes = []route{
 }
 
 var (
-	staticHttpServeMux http.Handler
-
 	staticAce             http.Handler
 	staticAero            http.Handler
 	staticBear            http.Handler
@@ -190,6 +188,7 @@ var (
 	staticGorillaMux      http.Handler
 	staticGowwwRouter     http.Handler
 	staticHttpRouter      http.Handler
+	staticHttpServeMux    http.Handler
 	staticHttpTreeMux     http.Handler
 	staticKocha           http.Handler
 	staticLARS            http.Handler
@@ -209,14 +208,6 @@ var (
 
 func init() {
 	println("#Static Routes:", len(staticRoutes))
-
-	calcMem("HttpServeMux", func() {
-		serveMux := http.NewServeMux()
-		for _, route := range staticRoutes {
-			serveMux.HandleFunc(route.path, httpHandlerFunc)
-		}
-		staticHttpServeMux = serveMux
-	})
 
 	calcMem("Ace", func() {
 		staticAce = loadAce(staticRoutes)
@@ -271,6 +262,9 @@ func init() {
 	})
 	calcMem("HttpRouter", func() {
 		staticHttpRouter = loadHttpRouter(staticRoutes)
+	})
+	calcMem("HttpServeMux", func() {
+		staticHttpServeMux = loadHttpServeMux(staticRoutes)
 	})
 	calcMem("HttpTreeMux", func() {
 		staticHttpTreeMux = loadHttpTreeMux(staticRoutes)
@@ -329,9 +323,6 @@ func BenchmarkAce_StaticAll(b *testing.B) {
 func BenchmarkAero_StaticAll(b *testing.B) {
 	benchRoutes(b, staticAero, staticRoutes)
 }
-func BenchmarkHttpServeMux_StaticAll(b *testing.B) {
-	benchRoutes(b, staticHttpServeMux, staticRoutes)
-}
 func BenchmarkBeego_StaticAll(b *testing.B) {
 	benchRoutes(b, staticBeego, staticRoutes)
 }
@@ -379,6 +370,9 @@ func BenchmarkGowwwRouter_StaticAll(b *testing.B) {
 }
 func BenchmarkHttpRouter_StaticAll(b *testing.B) {
 	benchRoutes(b, staticHttpRouter, staticRoutes)
+}
+func BenchmarkHttpServeMux_StaticAll(b *testing.B) {
+	benchRoutes(b, staticHttpServeMux, staticRoutes)
 }
 func BenchmarkHttpTreeMux_StaticAll(b *testing.B) {
 	benchRoutes(b, staticHttpRouter, staticRoutes)
